@@ -4,10 +4,6 @@
 > Built as a pivot from an audio fingerprinting system after discovering visual signals 
 > are far more resilient to TikTok/Instagram compression.
 
-![Python](https://img.shields.io/)
-![Flask](https://img.shields.io/)
-![PyTorch](https://img.shields.io/)
-
 ## Demo
 ```bash
 curl -X POST -F "file=@tiktok_clip.mp4" http://localhost:8080/api/v1/identify
