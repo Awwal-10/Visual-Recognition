@@ -4,10 +4,18 @@
 > Built as a pivot from an audio fingerprinting system after discovering visual signals 
 > are far more resilient to TikTok/Instagram compression.
 
+![Python](https://img.shields.io/)
+![Flask](https://img.shields.io/)
+![PyTorch](https://img.shields.io/)
+
 ## Demo
+**Try it now with your own video:**
 ```bash
-curl -X POST -F "file=@tiktok_clip.mp4" http://localhost:8080/api/v1/identify
+curl -X POST -F "file=@your_video.mp4" \
+  https://visual-recognition-production.up.railway.app/api/v1/identify
 ```
+
+**Example response:**
 ```json
 {
   "matched": true,
@@ -15,10 +23,15 @@ curl -X POST -F "file=@tiktok_clip.mp4" http://localhost:8080/api/v1/identify
   "year": 2012,
   "confidence": 1.0,
   "match_type": "strong",
-  "processing_time_ms": 593.8
+  "processing_time_ms": 6210.4,
+  "timestamp": 0.0
 }
 ```
 
+**Health check:**
+```bash
+curl https://visual-recognition-production.up.railway.app/api/v1/health
+```
 ## How It Works
 
 Two-stage hybrid pipeline combining speed and accuracy:
