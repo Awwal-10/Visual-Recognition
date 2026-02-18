@@ -3,7 +3,8 @@ flask
 flask-cors
 
 # Computer Vision
-opencv-python
+opencv-python-headless
+
 imagehash
 pillow
 
