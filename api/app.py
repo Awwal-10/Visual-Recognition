@@ -49,7 +49,7 @@ def enhance_with_backboard_ai(title: str, year: int) -> dict:
     
     try:
         response = requests.post(
-            "https://api.backboard.io/v1/chat/completions",
+            "https://app.backboard.io/api/v1/chat/completions",
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json"
