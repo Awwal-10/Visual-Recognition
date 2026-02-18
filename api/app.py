@@ -56,7 +56,23 @@ def health():
         "fingerprints": fp_count,
         "version": "1.0.0"
     })
-
+@app.route('/', methods=['GET'])
+def home():
+    """API documentation homepage"""
+    return jsonify({
+        "name": "Visual Recognition API",
+        "version": "1.0.0",
+        "description": "Identify movies and TV shows from video clips",
+        "endpoints": {
+            "health": "GET /api/v1/health",
+            "list_media": "GET /api/v1/media",
+            "identify": "POST /api/v1/identify (multipart/form-data with 'file' field)",
+            "identify_url": "POST /api/v1/identify/url (JSON with 'url' field)"
+        },
+        "live_demo": "curl -X POST -F 'file=@video.mp4' https://visual-recognition-production.up.railway.app/api/v1/identify",
+        "github": "https://github.com/Awwal-10/Visual-Recognition",
+        "status": "operational"
+    })
 
 @app.route('/api/v1/media', methods=['GET'])
 def list_media():
