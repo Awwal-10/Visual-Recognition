@@ -3,6 +3,8 @@ Visual Recognition API
 RESTful service for media identification
 """
 
+import requests
+import json
 import os
 import sys
 import tempfile
@@ -35,7 +37,59 @@ print("✅ API ready!")
 def allowed_file(filename: str) -> bool:
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+def enhance_with_backboard_ai(title: str, year: int) -> dict:
+    """
+    Enhance recognition results with Backboard AI
+    Provides movie metadata, genre, cast, similar titles
+    """
+    api_key = os.environ.get('BACKBOARD_API_KEY', '')
+    
+    if not api_key:
+        return {}
+    
+    try:
+        response = requests.post(
+            "https://api.backboard.io/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a movie database. Return ONLY valid JSON, no markdown, no explanations."
+                    },
+                    {
+                        "role": "user",
+                        "content": f'''For "{title}" ({year}), return this exact JSON structure:
+{{
+  "summary": "2-3 sentence plot summary",
+  "genre": ["genre1", "genre2"],
+  "director": "director name",
+  "main_cast": ["actor1", "actor2", "actor3"],
+  "similar_movies": ["movie1", "movie2", "movie3"],
+  "where_to_watch": "streaming platforms"
+}}'''
+                    }
+                ],
+                "max_tokens": 400,
+                "temperature": 0.3
+            },
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            content = response.json()['choices'][0]['message']['content']
+            # Strip any markdown formatting
+            content = content.replace('```json', '').replace('```', '').strip()
+            return json.loads(content)
+    
+    except Exception as e:
+        print(f"Backboard AI enhancement failed: {e}")
+    
+    return {}
 
 # ─── ROUTES ─────────────────────────────────────────────────────────────────
 
@@ -132,7 +186,15 @@ def identify():
     try:
         sample_frames = int(request.form.get('sample_frames', 5))
         result = recognizer.identify(tmp_path, sample_frames=sample_frames)
-        return jsonify(result.to_dict())
+        result_dict = result.to_dict()
+        
+        # Enhance with Backboard AI
+        if result.matched and result.title:
+            ai_metadata = enhance_with_backboard_ai(result.title, result.year)
+            if ai_metadata:
+                result_dict['ai_metadata'] = ai_metadata
+        
+        return jsonify(result_dict)
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
