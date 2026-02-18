@@ -1,10 +1,10 @@
 # Web Framework
 flask
 flask-cors
+requests
 
 # Computer Vision
 opencv-python-headless
-
 imagehash
 pillow
 
